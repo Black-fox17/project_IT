@@ -6,7 +6,7 @@ function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/info')
+    axios.get('https://project-it.onrender.com/info')
       .then(response => {
         setData(response.data);
       })
