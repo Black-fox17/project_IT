@@ -1,7 +1,7 @@
 # Project 0
 
 ## Description
-Project_0 is a web application that uses FastAPI for the backend and Vite with React for the frontend. This project send a get request to the backend using axios and display a json structured output of three keys which are name,current_datetime and github_url.
+Project_0 is a web application that uses FastAPI for the backend and Vite with React for the frontend. This project send a get request to the backend using axios and display a json structured output of three keys which are email,current_datetime and github_url.
 
 ## Setup Instructions
 
