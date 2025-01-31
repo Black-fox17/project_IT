@@ -17,7 +17,12 @@ function App() {
 
   return (
     <div>
-      <pre>{data ? JSON.stringify(data, null, 2) : 'Loading...'}</pre>
+      <textarea
+        readOnly
+        value={data ? JSON.stringify(data, null, 2) : 'Loading...'}
+        rows={20}
+        cols={80}
+      />
     </div>
   );
 }
