@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -13,13 +13,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-NIGERIA_TZ = timezone(timedelta(hours=1))
-
 @app.get("/info")
 def get_info():
     response_data = {
         "email": "ayeleru1234@gmail.com",
-        "current_datetime": datetime.now(NIGERIA_TZ).isoformat(),
+        "current_datetime": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "github_url": "https://github.com/Black-fox17/project_IT"
     }
     return JSONResponse(content=response_data)
