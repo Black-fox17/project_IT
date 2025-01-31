@@ -4,10 +4,9 @@ from datetime import datetime
 
 app = FastAPI()
 
-# Allow all origins for CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can specify a list of allowed origins instead of ["*"]
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -17,6 +16,6 @@ app.add_middleware(
 def get_info():
     return {
         "email": "ayeleru1234@gmail.com",
-        "current_datetime": datetime.now().isoformat(),
-        "github_url": "https://github.com/Black-fox17"
+        "datetime": datetime.now().isoformat(),
+        "github": "https://github.com/Black-fox17/project_IT"
     }
