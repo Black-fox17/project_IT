@@ -4,15 +4,11 @@ import requests
 import math as Math
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    # Add other origins as needed
-]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,16 +31,16 @@ def is_armstrong(number):
     power = len(digits)
     return number == sum(d ** power for d in digits)
 
-@app.get("/api/classify-number/{num}")
-async def classify(num: int):
-    prime_check = is_prime(num)
-    perfect_check = is_perfect(num)
-    armstrong_check = is_armstrong(num)
-    is_even = "even" if num % 2 == 0 else "odd"
+@app.get("/api/classify-number")
+async def classify(number: int):
+    prime_check = is_prime(number)
+    perfect_check = is_perfect(number)
+    armstrong_check = is_armstrong(number)
+    is_even = "even" if number % 2 == 0 else "odd"
 
     # Fetch fun fact with error handling
     try:
-        fun_fact_response = requests.get(f'http://numbersapi.com/{num}')
+        fun_fact_response = requests.get(f'http://numbersapi.com/{number}')
         fun_fact = fun_fact_response.text
     except requests.RequestException:
         fun_fact = "No fun fact available."
@@ -53,10 +49,10 @@ async def classify(num: int):
     properties.append(is_even)
 
     return {
-        "number": num,
+        "number": number,
         "is_prime": prime_check,
         "is_perfect": perfect_check,
         "properties": properties,
-        "digit_sum": sum(int(digit) for digit in str(num)),
+        "digit_sum": sum(int(digit) for digit in str(number)),
         "fun_fact": fun_fact
     }
