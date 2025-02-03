@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import requests
@@ -6,7 +6,7 @@ import math as Math
 
 app = FastAPI()
 
-# Enable CORS for all origins
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -26,23 +26,25 @@ def is_prime(num: int) -> bool:
 
 def is_perfect(num: int) -> bool:
     """Check if a number is a perfect number."""
+    if num < 1:  # Negative numbers cannot be perfect numbers
+        return False
     return num == sum(i for i in range(1, num) if num % i == 0)
 
 def is_armstrong(num: int) -> bool:
     """Check if a number is an Armstrong number."""
+    if num < 0:
+        return False  # Negative numbers cannot be Armstrong numbers
     digits = [int(digit) for digit in str(num)]
     power = len(digits)
     return num == sum(d ** power for d in digits)
 
 @app.get("/api/classify-number")
-async def classify(number: int):
-    # Ensure number is valid
-    try:
-        number = int(number)
-    except ValueError:
+async def classify(number: int = Query(..., description="Enter a valid integer")):
+    # Check for invalid numbers
+    if number < 0:
         return JSONResponse(
             status_code=400,
-            content={"number": "alphabet", "error": True}
+            content={"error": "Negative numbers are not supported"}
         )
 
     prime_check = is_prime(number)
@@ -50,14 +52,14 @@ async def classify(number: int):
     armstrong_check = is_armstrong(number)
     is_even = "even" if number % 2 == 0 else "odd"
 
-    # Fetch fun fact from Numbers API
+    # Fetch fun fact only if the number is valid
     fun_fact = "No fun fact available."
     try:
         response = requests.get(f"http://numbersapi.com/{number}/math")
         if response.status_code == 200:
             fun_fact = response.text
     except requests.RequestException:
-        pass
+        pass  # Handle failure gracefully
 
     # Determine properties
     properties = []
