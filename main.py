@@ -1,12 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import requests
 import math as Math
+
 app = FastAPI()
 
-
-
+# Enable CORS for all origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -15,39 +15,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def is_prime(num):
+def is_prime(num: int) -> bool:
+    """Check if a number is prime."""
     if num < 2:
         return False
-    for i in range(2, int(Math.sqrt(num)) + 1):  # Corrected range
+    for i in range(2, int(Math.sqrt(num)) + 1):
         if num % i == 0:
             return False
     return True
 
-def is_perfect(num):
-    total = sum(i for i in range(1, num) if num % i == 0)
-    return total == num
+def is_perfect(num: int) -> bool:
+    """Check if a number is a perfect number."""
+    return num == sum(i for i in range(1, num) if num % i == 0)
 
-def is_armstrong(number):
-    digits = [int(digit) for digit in str(number)]
+def is_armstrong(num: int) -> bool:
+    """Check if a number is an Armstrong number."""
+    digits = [int(digit) for digit in str(num)]
     power = len(digits)
-    return number == sum(d ** power for d in digits)
+    return num == sum(d ** power for d in digits)
 
 @app.get("/api/classify-number")
 async def classify(number: int):
+    # Ensure number is valid
+    try:
+        number = int(number)
+    except ValueError:
+        return JSONResponse(
+            status_code=400,
+            content={"number": "alphabet", "error": True}
+        )
+
     prime_check = is_prime(number)
     perfect_check = is_perfect(number)
     armstrong_check = is_armstrong(number)
     is_even = "even" if number % 2 == 0 else "odd"
 
-    # Fetch fun fact with error handling
+    # Fetch fun fact from Numbers API
+    fun_fact = "No fun fact available."
     try:
-        fun_fact_response = requests.get(f'http://numbersapi.com/{number}')
-        fun_fact = fun_fact_response.text
+        response = requests.get(f"http://numbersapi.com/{number}/math")
+        if response.status_code == 200:
+            fun_fact = response.text
     except requests.RequestException:
-        fun_fact = "No fun fact available."
+        pass
 
-    properties = ["armstrong"] if armstrong_check else []
+    # Determine properties
+    properties = []
+    if armstrong_check:
+        properties.append("armstrong")
     properties.append(is_even)
+
     response_data = {
         "number": number,
         "is_prime": prime_check,
@@ -56,4 +73,5 @@ async def classify(number: int):
         "digit_sum": sum(int(digit) for digit in str(number)),
         "fun_fact": fun_fact
     }
+
     return JSONResponse(content=response_data)
