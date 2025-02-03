@@ -1,5 +1,6 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import requests
 import math as Math
 app = FastAPI()
@@ -47,8 +48,7 @@ async def classify(number: int):
 
     properties = ["armstrong"] if armstrong_check else []
     properties.append(is_even)
-
-    return {
+    response_data = {
         "number": number,
         "is_prime": prime_check,
         "is_perfect": perfect_check,
@@ -56,3 +56,4 @@ async def classify(number: int):
         "digit_sum": sum(int(digit) for digit in str(number)),
         "fun_fact": fun_fact
     }
+    return JSONResponse(content=response_data)
