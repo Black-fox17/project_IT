@@ -39,12 +39,17 @@ def is_armstrong(num: int) -> bool:
     return num == sum(d ** power for d in digits)
 
 @app.get("/api/classify-number")
-async def classify(number: int = Query(..., description="Enter a valid integer")):
+async def classify(number: str):
     # Check for invalid numbers
-    if number < 0:
+    try:
+        number = int(number)
+    except ValueError:
         return JSONResponse(
             status_code=400,
-            content={"error": "Negative numbers are not supported"}
+            content={
+                "number": "alphabet",
+                "error": True
+            }
         )
 
     prime_check = is_prime(number)
@@ -57,7 +62,7 @@ async def classify(number: int = Query(..., description="Enter a valid integer")
     try:
         response = requests.get(f"http://numbersapi.com/{number}/math")
         if response.status_code == 200:
-            fun_fact = response.text
+                fun_fact = response.text
     except requests.RequestException:
         pass  # Handle failure gracefully
 
@@ -72,7 +77,7 @@ async def classify(number: int = Query(..., description="Enter a valid integer")
         "is_prime": prime_check,
         "is_perfect": perfect_check,
         "properties": properties,
-        "digit_sum": sum(int(digit) for digit in str(number)),
+        "digit_sum": sum(int(digit) for digit in str((number if number > 0 else -number))),
         "fun_fact": fun_fact
     }
 
