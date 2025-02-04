@@ -64,8 +64,4 @@ origins = ["*"]
 ```
 Modify the list to allow additional domains.
 
-## Contributing
-Feel free to fork the repository and submit pull requests with improvements.
-
-## License
-This project is open-source and free to use.
+## Thanks
