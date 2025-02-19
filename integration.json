@@ -1,0 +1,39 @@
+{
+	"data": {
+		"author": "Blackfox",
+		"date": {
+			"created_at": "2025-02-13",
+			"updated_at": "2025-02-13"
+		},
+		"descriptions": {
+			"app_description": "A message formatter bot that processes incoming messages and sends back formatted responses.",
+			"app_logo": "https://media.tifi.tv/telexbucket/public/logos/formatter.png",
+			"app_name": "Message Formatter",
+			"app_url": "https://txtformat.com/",
+			"background_color": "#ffffff"
+		},
+		"integration_category": "Communication & Collaboration",
+		"integration_type": "modifier",
+		"is_active": true,
+		"key_features": [
+			"Receive messages from Telex channels.",
+			"Format messages based on predefined templates or logic.",
+			"Send formatted responses back to the channel.",
+			"Log message formatting activity for auditing purposes."
+		],
+		"permissions": {
+			"events": [
+				"Receive messages from Telex channels.",
+				"Format messages based on predefined templates or logic.",
+				"Send formatted responses back to the channel.",
+				"Log message formatting activity for auditing purposes."
+			]
+		},
+		"settings": [
+			{"label": "site-1", "type": "text", "required": true, "default": ""}
+		],
+		"target_url": "https://system-integration.telex.im/format-message",
+		"tick_url": "https://system-integration.telex.im/format-message",
+		"website": "https://telex.im"
+	}
+}
