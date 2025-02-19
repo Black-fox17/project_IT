@@ -1,84 +1,78 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import requests
-import math as Math
+from pydantic import BaseModel
+from typing import List
+from fastapi import BackgroundTasks
+import httpx
+import asyncio
 
 app = FastAPI()
 
-# Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-def is_prime(num: int) -> bool:
-    """Check if a number is prime."""
-    if num < 2:
-        return False
-    for i in range(2, int(Math.sqrt(num)) + 1):
-        if num % i == 0:
-            return False
-    return True
+class Setting(BaseModel):
+    label: str
+    type: str
+    required: bool
+    default: str
 
-def is_perfect(num: int) -> bool:
-    """Check if a number is a perfect number."""
-    if num < 1:  # Negative numbers cannot be perfect numbers
-        return False
-    return num == sum(i for i in range(1, num) if num % i == 0)
+class MonitorPayload(BaseModel):
+    channel_id: str
+    return_url: str
+    settings: List[Setting]
 
-def is_armstrong(num: int) -> bool:
-    """Check if a number is an Armstrong number."""
-    if num < 0:
-        return False  # Negative numbers cannot be Armstrong numbers
-    digits = [int(digit) for digit in str(num)]
-    power = len(digits)
-    return num == sum(d ** power for d in digits)
-
-@app.get("/api/classify-number")
-async def classify(number: str):
-    # Check for invalid numbers
+async def check_site_status(site: str) -> str:
     try:
-        number = int(number)
-    except ValueError:
-        return JSONResponse(
-            status_code=400,
-            content={
-                "number": "alphabet",
-                "error": True
-            }
-        )
+        async with httpx.AsyncClient() as client:
+            response = await client.get(site, timeout=10)
+            if response.status_code < 400:
+                return None
+            return f"{site} is down (status {response.status_code})"
+    except Exception as e:
+        return f"{site} check failed: {str(e)}"
 
-    prime_check = is_prime(number)
-    perfect_check = is_perfect(number)
-    armstrong_check = is_armstrong(number)
-    is_even = "even" if number % 2 == 0 else "odd"
+async def monitor_task(payload: MonitorPayload):
+    sites = [s.default for s in payload.settings if s.label.startswith("site")]
+    results = await asyncio.gather(*(check_site_status(site) for site in sites))
 
-    # Fetch fun fact only if the number is valid
-    fun_fact = "No fun fact available."
-    try:
-        response = requests.get(f"http://numbersapi.com/{number}/math")
-        if response.status_code == 200:
-                fun_fact = response.text
-    except requests.RequestException:
-        pass  # Handle failure gracefully
+    message = "\n".join([result for result in results if result is not None])
 
-    # Determine properties
-    properties = []
-    if armstrong_check:
-        properties.append("armstrong")
-    properties.append(is_even)
-
-    response_data = {
-        "number": number,
-        "is_prime": prime_check,
-        "is_perfect": perfect_check,
-        "properties": properties,
-        "digit_sum": sum(int(digit) for digit in str((number if number > 0 else -number))),
-        "fun_fact": fun_fact
+    # data follows telex webhook format. Your integration must call the return_url using this format
+    data = {
+        "message": message,
+        "username": "Uptime Monitor",
+        "event_name": "Uptime Check",
+        "status": "error"
     }
 
-    return JSONResponse(content=response_data)
+    async with httpx.AsyncClient() as client:
+        await client.post(payload.return_url, json=data)
+
+@app.get("/integration.json")
+def get_integration_json(request: Request):
+    base_url = str(request.base_url).rstrip("/")
+    return {
+        "data": {
+            "descriptions": {
+                "app_name": "Uptime Monitor",
+                "app_description": "Monitors website uptime",
+                "app_url": base_url,
+                "app_logo": "https://i.imgur.com/lZqvffp.png",
+                "background_color": "#fff"
+            },
+            "integration_type": "interval",
+            "settings": [
+                {"label": "site-1", "type": "text", "required": True, "default": ""},
+                {"label": "site-2", "type": "text", "required": True, "default": ""},
+                {"label": "interval", "type": "text", "required": True, "default": "* * * * *"}
+            ],
+            "tick_url": f"{base_url}/tick"
+        }
+    }
