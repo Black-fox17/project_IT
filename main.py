@@ -76,3 +76,11 @@ def get_integration_json(request: Request):
             "tick_url": f"{base_url}/tick"
         }
     }
+
+
+from fastapi import BackgroundTasks
+
+@app.post("/tick", status_code=202)
+def monitor(payload: MonitorPayload, background_tasks: BackgroundTasks):
+    background_tasks.add_task(monitor_task, payload)
+    return {"status": "accepted"}
