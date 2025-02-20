@@ -6,34 +6,34 @@
 			"updated_at": "2025-02-13"
 		},
 		"descriptions": {
-			"app_description": "A message formatter bot that processes incoming messages and sends back formatted responses.",
-			"app_logo": "https://media.tifi.tv/telexbucket/public/logos/formatter.png",
-			"app_name": "Message Formatter",
-			"app_url": "https://txtformat.com/",
+			"app_description": "A bot that Monitors the number of daily active users on a platform.",
+			"app_logo": "https://img.icons8.com/?size=100&id=37410&format=png&color=000000",
+			"app_name": "Telex DAU Monitor",
+			"app_url": "",
 			"background_color": "#ffffff"
 		},
-		"integration_category": "Communication & Collaboration",
-		"integration_type": "modifier",
+		"integration_category": "CRM & Customer Support",
+		"integration_type": "output",
 		"is_active": true,
 		"key_features": [
-			"Receive messages from Telex channels.",
-			"Format messages based on predefined templates or logic.",
-			"Send formatted responses back to the channel.",
-			"Log message formatting activity for auditing purposes."
-		],
-		"permissions": {
-			"events": [
-				"Receive messages from Telex channels.",
-				"Format messages based on predefined templates or logic.",
-				"Send formatted responses back to the channel.",
-				"Log message formatting activity for auditing purposes."
-			]
+            "Receive messages from Telex channels.",
+            "Parse and process DAU metrics from received messages.",
+            "Format messages based on predefined templates or logic.",
+            "Send formatted DAU updates back to the channel.",
+            "Log message formatting and DAU tracking activity for auditing purposes."
+        ],
+        "permissions": {
+            "events": [
+                "Receive messages from Telex channels.",
+                "Parse and process DAU metrics.",
+                "Format messages based on predefined templates or logic.",
+                "Send formatted DAU updates back to the channel.",
+                "Log DAU tracking activity for auditing purposes."
+            ]
 		},
 		"settings": [
 			{"label": "site-1", "type": "text", "required": true, "default": ""}
 		],
-		"target_url": "https://system-integration.telex.im/format-message",
-		"tick_url": "https://system-integration.telex.im/format-message",
-		"website": "https://telex.im"
+		"tick_url": f"{base_url}/tick"
 	}
 }
