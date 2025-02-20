@@ -31,12 +31,11 @@ class MonitorPayload(BaseModel):
 
 async def fetch_dau_data(site: str) -> dict:
     """
-    Fetches the daily active user (DAU) count from a given website's API.
-    Modify the endpoint based on the actual analytics API being used.
+    Fetches the daily active user (DAU) count from my portfolio's API.
     """
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(f"{site}/api/dau", timeout=10)
+            response = await client.get(f"{site}/api/analytics/daily", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 return {"site": site, "dau": data.get("daily_active_users", 0)}
@@ -86,7 +85,7 @@ def get_integration_json(request: Request):
                 "background_color": "#ffffff"
             },
             "integration_category": "Analytics & Monitoring",
-            "integration_type": "output",
+            "integration_type": "interval",
             "is_active": True,
             "key_features": [
                 "Receive messages from Telex channels.",
@@ -105,8 +104,14 @@ def get_integration_json(request: Request):
                 ]
             },
             "settings": [
-                {"label": "site-1", "type": "text", "required": True, "default": ""}
+                {
+                    "label": "interval",
+                    "type": "text",
+                    "required": True,
+                    "default": "@daily"
+                }
             ],
+            "target_url": "https://portfolio-wahz.onrender.com/api/analytics/daily",
             "tick_url": f"{base_url}/tick"
         }
     }
