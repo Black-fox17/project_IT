@@ -32,7 +32,18 @@
             ]
 		},
 		"settings": [
-			{"label": "site-1", "type": "text", "required": true, "default": ""}
+			{
+				"label": "site-1",
+				"default": "https://portfolio-wahz.onrender.com",
+				"type": "text",
+				"required": true
+			},
+			{
+				"label": "interval",
+				"type": "text",
+				"required": true,
+				"default": "* * * * *"
+			}
 		],
 		"tick_url": f"{base_url}/tick"
 	}
