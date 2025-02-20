@@ -1,4 +1,4 @@
-curl --location 'http://localhost:8000/tick' \
+curl --location 'https://project-it.onrender.com/tick' \
 --header 'Content-Type: application/json' \
 --data '{
     "channel_id": "0195204d-4679-75ff-8d14-3fbed758cb3d",
